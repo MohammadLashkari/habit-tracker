@@ -1,6 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/constants/app_colors.dart';
 import 'package:habit_tracker/home/home_page.dart';
+import 'package:habit_tracker/theming/app_theme.dart';
 
 void main() {
   runApp(
@@ -15,9 +17,13 @@ class MainApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return const MaterialApp(
+    return MaterialApp(
       debugShowCheckedModeBanner: false,
-      home: HomePage(),
+      theme: ThemeData(),
+      home: AppTheme(
+        data: AppThemeData.defaultWithSwatch(AppColors.red),
+        child: const HomePage(),
+      ),
     );
   }
 }
