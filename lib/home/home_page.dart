@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/common_widgets/animated_task.dart';
 import 'package:habit_tracker/constants/app_assets.dart';
+import 'package:habit_tracker/models/task_preset.dart';
+import 'package:habit_tracker/task/task_with_name.dart';
 import 'package:habit_tracker/theming/app_theme.dart';
 
 class HomePage extends StatefulWidget {
@@ -19,9 +20,8 @@ class _HomePageState extends State<HomePage>
       body: const Center(
         child: SizedBox(
           width: 240,
-          height: 240,
-          child: AnimatedTask(
-            iconName: AppAssets.dog,
+          child: TaskWithName(
+            task: TaskPreset(name: 'Do Some Coding', iconName: AppAssets.html),
           ),
         ),
       ),

@@ -16,15 +16,18 @@ class TaskRing extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     final themeDate = AppTheme.of(context);
-    return CustomPaint(
-      painter: RingPainter(
-        progress: progress,
-        taskCompletedColor: themeDate.accent,
-        taskNotCompletedColor: themeDate.taskRing,
-      ),
-      child: SvgIcon(
-        iconName: iconName,
-        color: progress == 1 ? themeDate.accentNegative : themeDate.taskIcon,
+    return AspectRatio(
+      aspectRatio: 1.0,
+      child: CustomPaint(
+        painter: RingPainter(
+          progress: progress,
+          taskCompletedColor: themeDate.accent,
+          taskNotCompletedColor: themeDate.taskRing,
+        ),
+        child: SvgIcon(
+          iconName: iconName,
+          color: progress == 1 ? themeDate.accentNegative : themeDate.taskIcon,
+        ),
       ),
     );
   }

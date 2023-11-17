@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/common_widgets/task_ring.dart';
+import 'package:habit_tracker/constants/app_assets.dart';
+import 'package:habit_tracker/task/task_ring.dart';
 
 class AnimatedTask extends StatefulWidget {
   const AnimatedTask({
@@ -17,6 +18,7 @@ class _AnimatedTaskState extends State<AnimatedTask>
     with SingleTickerProviderStateMixin {
   late final AnimationController _controller;
   late final Animation<double> _animation;
+  bool _showCheckIcon = false;
 
   @override
   void initState() {
@@ -25,6 +27,7 @@ class _AnimatedTaskState extends State<AnimatedTask>
       vsync: this,
       duration: const Duration(milliseconds: 750),
     );
+    _controller.addStatusListener(_checkStatusUpdates);
     _animation = CurvedAnimation(
       parent: _controller,
       curve: Curves.easeInOut,
@@ -37,10 +40,26 @@ class _AnimatedTaskState extends State<AnimatedTask>
     super.dispose();
   }
 
+  void _checkStatusUpdates(AnimationStatus status) {
+    if (_controller.isCompleted) {
+      if (mounted) {
+        setState(() => _showCheckIcon = true);
+      }
+      Future.delayed(
+        const Duration(milliseconds: 750),
+        () {
+          if (mounted) {
+            setState(() => _showCheckIcon = false);
+          }
+        },
+      );
+    }
+  }
+
   void _tapDown(TapDownDetails details) {
     if (!_controller.isCompleted) {
       _controller.forward();
-    } else {
+    } else if (!_showCheckIcon) {
       _controller.reset();
     }
   }
@@ -51,17 +70,23 @@ class _AnimatedTaskState extends State<AnimatedTask>
     }
   }
 
+  void _tapCancel() {
+    if (!_controller.isCompleted) {
+      _controller.reverse();
+    }
+  }
+
   @override
   Widget build(BuildContext context) {
     return GestureDetector(
       onTapUp: _tapUp,
       onTapDown: _tapDown,
+      onTapCancel: _tapCancel,
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
-          // final themeDate = AppTheme.of(context);
           return TaskRing(
-            iconName: widget.iconName,
+            iconName: _showCheckIcon ? AppAssets.check : widget.iconName,
             progress: _animation.value,
           );
         },
