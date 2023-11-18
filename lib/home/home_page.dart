@@ -8,9 +8,9 @@ class HomePage extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final box = ref.watch(hiveDataBaseProvider);
+    final database = ref.watch(hiveDataBaseProvider);
     return ValueListenableBuilder(
-      valueListenable: box.taskListenble(),
+      valueListenable: database.taskListenble(),
       builder: (context, box, child) {
         return TasksGridScreen(
           tasks: box.values.toList(),

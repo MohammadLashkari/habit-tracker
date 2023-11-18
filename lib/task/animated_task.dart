@@ -6,9 +6,13 @@ class AnimatedTask extends StatefulWidget {
   const AnimatedTask({
     super.key,
     required this.iconName,
+    required this.completed,
+    this.onCompleted,
   });
 
   final String iconName;
+  final bool completed;
+  final ValueChanged<bool>? onCompleted;
 
   @override
   State<AnimatedTask> createState() => _AnimatedTaskState();
@@ -42,6 +46,7 @@ class _AnimatedTaskState extends State<AnimatedTask>
 
   void _checkStatusUpdates(AnimationStatus status) {
     if (_controller.isCompleted) {
+      widget.onCompleted?.call(true);
       if (mounted) {
         setState(() => _showCheckIcon = true);
       }
@@ -57,10 +62,11 @@ class _AnimatedTaskState extends State<AnimatedTask>
   }
 
   void _tapDown(TapDownDetails details) {
-    if (!_controller.isCompleted) {
+    if (!_controller.isCompleted && !widget.completed) {
       _controller.forward();
     } else if (!_showCheckIcon) {
       _controller.reset();
+      widget.onCompleted?.call(false);
     }
   }
 
@@ -85,9 +91,10 @@ class _AnimatedTaskState extends State<AnimatedTask>
       child: AnimatedBuilder(
         animation: _controller,
         builder: (context, child) {
+          final progress = widget.completed ? 1.0 : _animation.value;
           return TaskRing(
             iconName: _showCheckIcon ? AppAssets.check : widget.iconName,
-            progress: _animation.value,
+            progress: progress,
           );
         },
       ),
