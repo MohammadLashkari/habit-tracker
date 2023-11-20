@@ -3,6 +3,7 @@ import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/home/tasks_grid_screen.dart';
 import 'package:habit_tracker/persistence/hive_database.dart';
 import 'package:habit_tracker/sliding_panel/animated_sliding_panel.dart';
+import 'package:habit_tracker/theming/app_theme_notifier.dart';
 import 'package:page_flip_builder/page_flip_builder.dart';
 
 class HomeScreen extends ConsumerStatefulWidget {
@@ -31,11 +32,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         valueListenable: database.frontTaskListenble(),
         builder: (context, box, child) {
           return TasksGridScreen(
+            key: GlobalKey(),
             leftAnimatedKey: _frontLeftAnimatiedSlidingPanelKey,
             rightAnimatedKey: _frontRigthAnimatiedSlidingPanelKey,
-            key: GlobalKey(),
             tasks: box.values.toList(),
             onFlip: () => _pageFlipKey.currentState?.flip(),
+            themeSettings: ref.watch(frontThemeProvider),
+            onColorIndexSelected: (colorIndex) => ref
+                .read(frontThemeProvider.notifier)
+                .updateColorIndex(colorIndex),
+            onVariantIndexSelected: (variantIndex) => ref
+                .read(frontThemeProvider.notifier)
+                .updateVariantIndex(variantIndex),
           );
         },
       ),
@@ -43,11 +51,18 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         valueListenable: database.backTaskListenble(),
         builder: (context, box, child) {
           return TasksGridScreen(
+            key: GlobalKey(),
             leftAnimatedKey: _backLeftAnimatiedSlidingPanelKey,
             rightAnimatedKey: _backRigthAnimatiedSlidingPanelKey,
-            key: GlobalKey(),
             tasks: box.values.toList(),
             onFlip: () => _pageFlipKey.currentState?.flip(),
+            themeSettings: ref.watch(backThemeProvider),
+            onColorIndexSelected: (colorIndex) => ref
+                .read(backThemeProvider.notifier)
+                .updateColorIndex(colorIndex),
+            onVariantIndexSelected: (variantIndex) => ref
+                .read(backThemeProvider.notifier)
+                .updateVariantIndex(variantIndex),
           );
         },
       ),

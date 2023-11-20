@@ -2,16 +2,28 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/constants/app_assets.dart';
-import 'package:habit_tracker/constants/app_colors.dart';
 import 'package:habit_tracker/home/home_screen.dart';
+import 'package:habit_tracker/models/front_or_back_side.dart';
 import 'package:habit_tracker/models/task.dart';
 import 'package:habit_tracker/persistence/hive_database.dart';
-import 'package:habit_tracker/theming/app_theme.dart';
+import 'package:habit_tracker/theming/app_theme_notifier.dart';
 
 Future<void> main() async {
-  final hiveDataBase = HiveDataBase();
-  await hiveDataBase.init();
-  await hiveDataBase.createDemoTasks(
+  WidgetsFlutterBinding.ensureInitialized();
+  // Change SystemNavigationBar setting
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
+  );
+
+  final hiveDatabase = HiveDatabase();
+  await hiveDatabase.init();
+  await hiveDatabase.createDemoTasks(
     frontTasks: [
       Task(name: 'Eat a Healthy Meal', iconName: AppAssets.carrot),
       Task(name: 'Walk the Dog', iconName: AppAssets.dog),
@@ -28,20 +40,30 @@ Future<void> main() async {
     ],
     force: false,
   );
-  // Change SystemNavigationBar setting
-  SystemChrome.setSystemUIOverlayStyle(
-    const SystemUiOverlayStyle(
-      systemNavigationBarColor: Colors.transparent,
-      systemNavigationBarDividerColor: Colors.transparent,
-    ),
+  final frontThemeSettings = await hiveDatabase.appThemeSettings(
+    side: FrontOrBackSide.front,
   );
-  SystemChrome.setEnabledSystemUIMode(
-    SystemUiMode.edgeToEdge,
+  final backThemeSettings = await hiveDatabase.appThemeSettings(
+    side: FrontOrBackSide.back,
   );
   runApp(
     ProviderScope(
       overrides: [
-        hiveDataBaseProvider.overrideWithValue(hiveDataBase),
+        hiveDataBaseProvider.overrideWithValue(hiveDatabase),
+        frontThemeProvider.overrideWith(
+          (ref) => AppThemeNotifier(
+            themeSttings: frontThemeSettings,
+            hiveDatabase: hiveDatabase,
+            side: FrontOrBackSide.front,
+          ),
+        ),
+        backThemeProvider.overrideWith(
+          (ref) => AppThemeNotifier(
+            themeSttings: backThemeSettings,
+            hiveDatabase: hiveDatabase,
+            side: FrontOrBackSide.back,
+          ),
+        ),
       ],
       child: const MainApp(),
     ),
@@ -56,10 +78,7 @@ class MainApp extends StatelessWidget {
     return MaterialApp(
       debugShowCheckedModeBanner: false,
       theme: ThemeData(),
-      home: AppTheme(
-        data: AppThemeData.defaultWithSwatch(AppColors.red),
-        child: const HomeScreen(),
-      ),
+      home: const HomeScreen(),
     );
   }
 }

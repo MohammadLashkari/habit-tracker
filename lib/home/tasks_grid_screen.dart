@@ -15,12 +15,18 @@ class TasksGridScreen extends StatelessWidget {
     required this.tasks,
     required this.leftAnimatedKey,
     required this.rightAnimatedKey,
+    required this.themeSettings,
+    this.onColorIndexSelected,
+    this.onVariantIndexSelected,
     this.onFlip,
   });
   final List<Task> tasks;
   final VoidCallback? onFlip;
   final GlobalKey<AnimatedSlidingPanelState> leftAnimatedKey;
   final GlobalKey<AnimatedSlidingPanelState> rightAnimatedKey;
+  final AppThemeSettings themeSettings;
+  final ValueChanged<int>? onColorIndexSelected;
+  final ValueChanged<int>? onVariantIndexSelected;
 
   void _enterEditMode() {
     leftAnimatedKey.currentState?.slidIn();
@@ -34,47 +40,52 @@ class TasksGridScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final backgroundColor = AppTheme.of(context).primary;
-    return Scaffold(
-      backgroundColor: backgroundColor,
-      body: SafeArea(
-        child: Stack(
-          children: [
-            TasksGridContents(
-              tasks: tasks,
-              onFlip: onFlip,
-              onEnterEditMode: _enterEditMode,
-            ),
-            Positioned(
-              bottom: 7.0,
-              left: 0.0,
-              width: SlidingPanel.leftPanelFixedWidth,
-              child: AnimatedSlidingPanel(
-                key: leftAnimatedKey,
-                direction: PanelDirection.left,
-                child: ThemeSelectionClose(
-                  onClose: _exitEditMode,
-                ),
-              ),
-            ),
-            Positioned(
-              bottom: 7.0,
-              right: 0.0,
-              width: MediaQuery.sizeOf(context).width -
-                  SlidingPanel.leftPanelFixedWidth,
-              child: AnimatedSlidingPanel(
-                key: rightAnimatedKey,
-                direction: PanelDirection.right,
-                child: ThemeSelectionList(
-                  currentThemeSettings: AppThemeSettings(
-                    colorIndex: 0,
-                    variantIndex: 0,
+    return AppTheme(
+      data: themeSettings.themeData,
+      child: Builder(
+        builder: (context) {
+          return Scaffold(
+            backgroundColor: AppTheme.of(context).primary,
+            body: SafeArea(
+              child: Stack(
+                children: [
+                  TasksGridContents(
+                    tasks: tasks,
+                    onFlip: onFlip,
+                    onEnterEditMode: _enterEditMode,
                   ),
-                ),
+                  Positioned(
+                    bottom: 7.0,
+                    left: 0.0,
+                    width: SlidingPanel.leftPanelFixedWidth,
+                    child: AnimatedSlidingPanel(
+                      key: leftAnimatedKey,
+                      direction: PanelDirection.left,
+                      child: ThemeSelectionClose(
+                        onClose: _exitEditMode,
+                      ),
+                    ),
+                  ),
+                  Positioned(
+                    bottom: 7.0,
+                    right: 0.0,
+                    width: MediaQuery.sizeOf(context).width -
+                        SlidingPanel.leftPanelFixedWidth,
+                    child: AnimatedSlidingPanel(
+                      key: rightAnimatedKey,
+                      direction: PanelDirection.right,
+                      child: ThemeSelectionList(
+                        currentThemeSettings: themeSettings,
+                        onColorIndexSelected: onColorIndexSelected,
+                        onVariantIndexSelected: onVariantIndexSelected,
+                      ),
+                    ),
+                  ),
+                ],
               ),
             ),
-          ],
-        ),
+          );
+        },
       ),
     );
   }
