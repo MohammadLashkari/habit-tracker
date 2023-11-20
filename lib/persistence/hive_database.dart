@@ -1,13 +1,17 @@
 import 'package:flutter/foundation.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/models/app_theme_settings.dart';
+import 'package:habit_tracker/models/front_or_back_side.dart';
 import 'package:habit_tracker/models/task.dart';
 import 'package:habit_tracker/models/task_state.dart';
 import 'package:hive_flutter/hive_flutter.dart';
 
-class HiveDataBase {
+class HiveDatabase {
   static const frontTasksBoxName = 'frontTasks';
   static const backTasksBoxName = 'backTasks';
   static const tasksStateBoxName = 'tasksState';
+  static const frontAppThemeBoxName = 'frontAppTheme';
+  static const backAppThemeBoxName = 'backAppTheme';
   static String taskStateKey(String key) => 'tasksState/$key';
 
   Future<void> init() async {
@@ -15,10 +19,13 @@ class HiveDataBase {
     // Register adapters
     Hive.registerAdapter<Task>(TaskAdapter());
     Hive.registerAdapter<TaskState>(TaskStateAdapter());
+    Hive.registerAdapter<AppThemeSettings>(AppThemeSettingsAdapter());
     // Open boxes
     await Hive.openBox<Task>(frontTasksBoxName);
     await Hive.openBox<Task>(backTasksBoxName);
     await Hive.openBox<TaskState>(tasksStateBoxName);
+    await Hive.openBox<AppThemeSettings>(frontAppThemeBoxName);
+    await Hive.openBox<AppThemeSettings>(backAppThemeBoxName);
   }
 
   Future<void> createDemoTasks({
@@ -38,6 +45,7 @@ class HiveDataBase {
     }
   }
 
+  // front and back tasks
   ValueListenable<Box<Task>> frontTaskListenble() {
     return Hive.box<Task>(frontTasksBoxName).listenable();
   }
@@ -46,6 +54,7 @@ class HiveDataBase {
     return Hive.box<Task>(backTasksBoxName).listenable();
   }
 
+  // TaskState methods
   Future<void> setTaskState({
     required Task task,
     required bool completed,
@@ -67,8 +76,31 @@ class HiveDataBase {
     final key = taskStateKey(task.id);
     return box.get(key) ?? TaskState(taskId: task.id, completed: false);
   }
+
+  // App Theme Settings
+  Future<void> setAppThemeSettings({
+    required AppThemeSettings settings,
+    required FrontOrBackSide side,
+  }) async {
+    final themeKey = side == FrontOrBackSide.front
+        ? frontAppThemeBoxName
+        : backAppThemeBoxName;
+    final box = Hive.box<AppThemeSettings>(themeKey);
+    await box.put(themeKey, settings);
+  }
+
+  Future<AppThemeSettings> appThemeSettings({
+    required FrontOrBackSide side,
+  }) async {
+    final themeKey = side == FrontOrBackSide.front
+        ? frontAppThemeBoxName
+        : backAppThemeBoxName;
+    final box = Hive.box<AppThemeSettings>(themeKey);
+    final settings = box.get(themeKey);
+    return settings ?? AppThemeSettings.defaults(side);
+  }
 }
 
-final hiveDataBaseProvider = Provider<HiveDataBase>((ref) {
+final hiveDataBaseProvider = Provider<HiveDatabase>((ref) {
   throw UnimplementedError();
 });

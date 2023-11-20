@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:flutter/services.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/constants/app_assets.dart';
 import 'package:habit_tracker/constants/app_colors.dart';
@@ -25,7 +26,17 @@ Future<void> main() async {
       Task(name: 'Play Sports', iconName: AppAssets.basketball),
       Task(name: 'Spend Time Outside', iconName: AppAssets.sun),
     ],
-    force: true,
+    force: false,
+  );
+  // Change SystemNavigationBar setting
+  SystemChrome.setSystemUIOverlayStyle(
+    const SystemUiOverlayStyle(
+      systemNavigationBarColor: Colors.transparent,
+      systemNavigationBarDividerColor: Colors.transparent,
+    ),
+  );
+  SystemChrome.setEnabledSystemUIMode(
+    SystemUiMode.edgeToEdge,
   );
   runApp(
     ProviderScope(
@@ -47,7 +58,7 @@ class MainApp extends StatelessWidget {
       theme: ThemeData(),
       home: AppTheme(
         data: AppThemeData.defaultWithSwatch(AppColors.red),
-        child: HomeScreen(),
+        child: const HomeScreen(),
       ),
     );
   }

@@ -21,7 +21,7 @@ class TaskWithName extends StatelessWidget {
       mainAxisSize: MainAxisSize.min,
       children: [
         Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 8.0),
+          padding: const EdgeInsets.symmetric(horizontal: 9.0),
           child: AnimatedTask(
             iconName: task.iconName,
             completed: completed,
