@@ -8,8 +8,12 @@ class TaskWithNameLoader extends ConsumerWidget {
   const TaskWithNameLoader({
     super.key,
     required this.task,
+    this.isEditing = false,
+    this.editTaskButton,
   });
   final Task task;
+  final bool isEditing;
+  final Widget? editTaskButton;
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
@@ -21,6 +25,7 @@ class TaskWithNameLoader extends ConsumerWidget {
         return TaskWithName(
           task: task,
           completed: taskState.completed,
+          editTaskButtonBuilder: editTaskButton,
           onCompleted: (completed) {
             ref.read(hiveDataBaseProvider).setTaskState(
                   task: task,

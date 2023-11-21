@@ -30,7 +30,6 @@ Future<void> main() async {
       Task(name: 'Do Some Coding', iconName: AppAssets.html),
       Task(name: 'Do 10 Pushups', iconName: AppAssets.pushups),
       Task(name: 'Play Sports', iconName: AppAssets.basketball),
-      Task(name: 'Spend Time Outside', iconName: AppAssets.sun),
     ],
     backTasks: [
       Task(name: 'Eat a Healthy Meal', iconName: AppAssets.carrot),

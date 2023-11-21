@@ -7,6 +7,7 @@ import 'package:habit_tracker/sliding_panel/animated_sliding_panel.dart';
 import 'package:habit_tracker/sliding_panel/sliding_panel.dart';
 import 'package:habit_tracker/sliding_panel/theme_selection_close.dart';
 import 'package:habit_tracker/sliding_panel/theme_selection_list.dart';
+import 'package:habit_tracker/theming/animated_app_theme.dart';
 import 'package:habit_tracker/theming/app_theme.dart';
 
 class TasksGridScreen extends StatelessWidget {
@@ -16,6 +17,7 @@ class TasksGridScreen extends StatelessWidget {
     required this.leftAnimatedKey,
     required this.rightAnimatedKey,
     required this.themeSettings,
+    required this.gridKey,
     this.onColorIndexSelected,
     this.onVariantIndexSelected,
     this.onFlip,
@@ -24,6 +26,7 @@ class TasksGridScreen extends StatelessWidget {
   final VoidCallback? onFlip;
   final GlobalKey<AnimatedSlidingPanelState> leftAnimatedKey;
   final GlobalKey<AnimatedSlidingPanelState> rightAnimatedKey;
+  final GlobalKey<TasksGridState> gridKey;
   final AppThemeSettings themeSettings;
   final ValueChanged<int>? onColorIndexSelected;
   final ValueChanged<int>? onVariantIndexSelected;
@@ -31,17 +34,20 @@ class TasksGridScreen extends StatelessWidget {
   void _enterEditMode() {
     leftAnimatedKey.currentState?.slidIn();
     rightAnimatedKey.currentState?.slidIn();
+    gridKey.currentState?.enterEditMode();
   }
 
   void _exitEditMode() {
     leftAnimatedKey.currentState?.slidOut();
     rightAnimatedKey.currentState?.slidOut();
+    gridKey.currentState?.exitEditMode();
   }
 
   @override
   Widget build(BuildContext context) {
-    return AppTheme(
+    return AnimatedAppTheme(
       data: themeSettings.themeData,
+      duration: const Duration(seconds: 5),
       child: Builder(
         builder: (context) {
           return Scaffold(
@@ -50,6 +56,7 @@ class TasksGridScreen extends StatelessWidget {
               child: Stack(
                 children: [
                   TasksGridContents(
+                    gridKey: gridKey,
                     tasks: tasks,
                     onFlip: onFlip,
                     onEnterEditMode: _enterEditMode,
@@ -95,10 +102,12 @@ class TasksGridContents extends StatelessWidget {
   const TasksGridContents({
     super.key,
     required this.tasks,
+    this.gridKey,
     this.onFlip,
     this.onEnterEditMode,
   });
   final List<Task> tasks;
+  final Key? gridKey;
   final VoidCallback? onFlip;
   final VoidCallback? onEnterEditMode;
 
@@ -110,6 +119,7 @@ class TasksGridContents extends StatelessWidget {
           child: Padding(
             padding: const EdgeInsets.all(24.0),
             child: TasksGrid(
+              key: gridKey,
               tasks: tasks,
             ),
           ),

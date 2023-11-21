@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_riverpod/flutter_riverpod.dart';
+import 'package:habit_tracker/home/tasks_grid.dart';
 import 'package:habit_tracker/home/tasks_grid_screen.dart';
 import 'package:habit_tracker/persistence/hive_database.dart';
 import 'package:habit_tracker/sliding_panel/animated_sliding_panel.dart';
@@ -23,6 +24,8 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
       GlobalKey<AnimatedSlidingPanelState>();
   final _backLeftAnimatiedSlidingPanelKey =
       GlobalKey<AnimatedSlidingPanelState>();
+  final _frontGridKey = GlobalKey<TasksGridState>();
+  final _backGridKey = GlobalKey<TasksGridState>();
   @override
   Widget build(BuildContext context) {
     final database = ref.watch(hiveDataBaseProvider);
@@ -33,6 +36,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         builder: (context, box, child) {
           return TasksGridScreen(
             key: GlobalKey(),
+            gridKey: _frontGridKey,
             leftAnimatedKey: _frontLeftAnimatiedSlidingPanelKey,
             rightAnimatedKey: _frontRigthAnimatiedSlidingPanelKey,
             tasks: box.values.toList(),
@@ -52,6 +56,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
         builder: (context, box, child) {
           return TasksGridScreen(
             key: GlobalKey(),
+            gridKey: _backGridKey,
             leftAnimatedKey: _backLeftAnimatiedSlidingPanelKey,
             rightAnimatedKey: _backRigthAnimatiedSlidingPanelKey,
             tasks: box.values.toList(),
