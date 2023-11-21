@@ -117,7 +117,11 @@ class TasksGridContents extends StatelessWidget {
       children: [
         Expanded(
           child: Padding(
-            padding: const EdgeInsets.all(24.0),
+            padding: const EdgeInsets.only(
+              left: 24.0,
+              right: 24.0,
+              top: 24.0,
+            ),
             child: TasksGrid(
               key: gridKey,
               tasks: tasks,

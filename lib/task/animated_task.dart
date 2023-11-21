@@ -8,10 +8,12 @@ class AnimatedTask extends StatefulWidget {
     required this.iconName,
     required this.completed,
     this.onCompleted,
+    this.hasCompletedState = true,
   });
 
   final String iconName;
   final bool completed;
+  final bool hasCompletedState;
   final ValueChanged<bool>? onCompleted;
 
   @override
@@ -47,17 +49,21 @@ class _AnimatedTaskState extends State<AnimatedTask>
   void _checkStatusUpdates(AnimationStatus status) {
     if (_controller.isCompleted) {
       widget.onCompleted?.call(true);
-      if (mounted) {
-        setState(() => _showCheckIcon = true);
+      if (widget.hasCompletedState) {
+        if (mounted) {
+          setState(() => _showCheckIcon = true);
+        }
+        Future.delayed(
+          const Duration(milliseconds: 750),
+          () {
+            if (mounted) {
+              setState(() => _showCheckIcon = false);
+            }
+          },
+        );
+      } else {
+        _controller.reset();
       }
-      Future.delayed(
-        const Duration(milliseconds: 750),
-        () {
-          if (mounted) {
-            setState(() => _showCheckIcon = false);
-          }
-        },
-      );
     }
   }
 

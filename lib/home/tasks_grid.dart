@@ -1,5 +1,9 @@
+import 'dart:math';
+
 import 'package:flutter/material.dart';
-import 'package:habit_tracker/animations/staggerd_scale_animated_widget.dart';
+import 'package:habit_tracker/animations/fade_animation.dart';
+import 'package:habit_tracker/animations/staggerd_scale_animation.dart';
+import 'package:habit_tracker/common_widgets/add_task_item.dart';
 import 'package:habit_tracker/common_widgets/edit_task_button.dart';
 import 'package:habit_tracker/models/task.dart';
 import 'package:habit_tracker/task/task_with_name_loader.dart';
@@ -25,7 +29,7 @@ class TasksGridState extends State<TasksGrid>
     super.initState();
     _contrller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 350),
+      duration: const Duration(milliseconds: 300),
     );
   }
 
@@ -53,13 +57,19 @@ class TasksGridState extends State<TasksGrid>
         mainAxisSpacing: 40,
         childAspectRatio: 0.8,
       ),
-      itemCount: widget.tasks.length,
+      itemCount: min(6, widget.tasks.length + 1),
       itemBuilder: (context, index) {
+        if (index == widget.tasks.length) {
+          return FadeAnimation(
+            animation: _contrller,
+            child: const AddTaskItem(),
+          );
+        }
         final task = widget.tasks[index];
         return TaskWithNameLoader(
           task: task,
           isEditing: false,
-          editTaskButton: StaggeredScaleAnimationedWidget(
+          editTaskButton: StaggeredScaleAnimation(
             animation: _contrller,
             index: index,
             child: EditTaskButton(

@@ -25,7 +25,7 @@ class TaskWithNameLoader extends ConsumerWidget {
         return TaskWithName(
           task: task,
           completed: taskState.completed,
-          editTaskButtonBuilder: editTaskButton,
+          editTaskButton: editTaskButton,
           onCompleted: (completed) {
             ref.read(hiveDataBaseProvider).setTaskState(
                   task: task,

@@ -10,16 +10,17 @@ class TaskWithName extends StatelessWidget {
     required this.task,
     this.completed = false,
     this.isEditing = false,
+    this.hasCompletedState = true,
     this.onCompleted,
-    this.editTaskButtonBuilder,
+    this.editTaskButton,
   });
 
   final Task task;
   final bool completed;
-  // final bool hasCompletedState;
+  final bool hasCompletedState;
   final bool isEditing;
   final ValueChanged<bool>? onCompleted;
-  final Widget? editTaskButtonBuilder;
+  final Widget? editTaskButton;
 
   @override
   Widget build(BuildContext context) {
@@ -34,14 +35,15 @@ class TaskWithName extends StatelessWidget {
                 iconName: task.iconName,
                 completed: completed,
                 onCompleted: onCompleted,
+                hasCompletedState: hasCompletedState,
               ),
-              if (editTaskButtonBuilder != null)
+              if (editTaskButton != null)
                 Positioned.fill(
                   child: FractionallySizedBox(
                     widthFactor: EditTaskButton.scaleFactor,
                     heightFactor: EditTaskButton.scaleFactor,
                     alignment: Alignment.bottomRight,
-                    child: editTaskButtonBuilder!,
+                    child: editTaskButton!,
                   ),
                 ),
             ],
