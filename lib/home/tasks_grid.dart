@@ -1,21 +1,25 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:habit_tracker/add_task/add_task_screen.dart';
+import 'package:habit_tracker/add_task/task_details_screen.dart';
 import 'package:habit_tracker/animations/fade_animation.dart';
 import 'package:habit_tracker/animations/staggerd_scale_animation.dart';
 import 'package:habit_tracker/common_widgets/add_task_item.dart';
 import 'package:habit_tracker/common_widgets/edit_task_button.dart';
+import 'package:habit_tracker/models/front_or_back_side.dart';
 import 'package:habit_tracker/models/task.dart';
 import 'package:habit_tracker/task/task_with_name_loader.dart';
+import 'package:habit_tracker/theming/app_theme.dart';
 
 class TasksGrid extends StatefulWidget {
   const TasksGrid({
     super.key,
     required this.tasks,
-    this.onEditTask,
+    this.onAddOrEditTask,
   });
   final List<Task> tasks;
-  final VoidCallback? onEditTask;
+  final VoidCallback? onAddOrEditTask;
 
   @override
   State<TasksGrid> createState() => TasksGridState();
@@ -24,12 +28,13 @@ class TasksGrid extends StatefulWidget {
 class TasksGridState extends State<TasksGrid>
     with SingleTickerProviderStateMixin {
   late final AnimationController _contrller;
+  bool _isEditing = false;
   @override
   void initState() {
     super.initState();
     _contrller = AnimationController(
       vsync: this,
-      duration: const Duration(milliseconds: 300),
+      duration: const Duration(milliseconds: 270),
     );
   }
 
@@ -41,10 +46,50 @@ class TasksGridState extends State<TasksGrid>
 
   void enterEditMode() {
     _contrller.forward();
+    setState(() => _isEditing = true);
   }
 
   void exitEditMode() {
     _contrller.reverse();
+    setState(() => _isEditing = false);
+  }
+
+  Future<void> _addTask() async {
+    widget.onAddOrEditTask?.call();
+    await Future.delayed(const Duration(milliseconds: 270));
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => AppTheme(
+            data: AppTheme.of(context),
+            child: const AddTaskScreen(),
+          ),
+        ),
+      );
+    }
+  }
+
+  Future<void> _editTask(Task task) async {
+    widget.onAddOrEditTask?.call();
+    await Future.delayed(const Duration(milliseconds: 270));
+    if (mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          fullscreenDialog: true,
+          builder: (_) => AppTheme(
+            data: AppTheme.of(context),
+            child: TaskDetailsScreen(
+              task: task,
+              isNewTask: false,
+              frontOrBackSide: FrontOrBackSide.front,
+            ),
+          ),
+        ),
+      );
+    }
   }
 
   @override
@@ -62,18 +107,20 @@ class TasksGridState extends State<TasksGrid>
         if (index == widget.tasks.length) {
           return FadeAnimation(
             animation: _contrller,
-            child: const AddTaskItem(),
+            child: AddTaskItem(
+              onCompleted: _isEditing ? _addTask : null,
+            ),
           );
         }
         final task = widget.tasks[index];
         return TaskWithNameLoader(
           task: task,
-          isEditing: false,
+          isEditing: _isEditing,
           editTaskButton: StaggeredScaleAnimation(
             animation: _contrller,
             index: index,
             child: EditTaskButton(
-              onPressed: () {},
+              onPressed: () => _editTask(task),
             ),
           ),
         );

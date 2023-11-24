@@ -1,3 +1,4 @@
+import 'package:flutter/foundation.dart' show immutable;
 import 'package:habit_tracker/constants/app_colors.dart';
 import 'package:habit_tracker/models/front_or_back_side.dart';
 import 'package:habit_tracker/theming/app_theme.dart';
@@ -5,6 +6,7 @@ import 'package:hive/hive.dart';
 
 part 'app_theme_settings.g.dart';
 
+@immutable
 @HiveType(typeId: 2)
 class AppThemeSettings {
   // Index used to reference one of the colors in AppColors
@@ -17,7 +19,7 @@ class AppThemeSettings {
   @HiveField(1)
   final int variantIndex;
 
-  AppThemeSettings({
+  const AppThemeSettings({
     required this.colorIndex,
     required this.variantIndex,
   });

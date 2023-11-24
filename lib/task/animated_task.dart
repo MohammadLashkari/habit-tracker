@@ -7,12 +7,14 @@ class AnimatedTask extends StatefulWidget {
     super.key,
     required this.iconName,
     required this.completed,
+    required this.isEditing,
     this.onCompleted,
     this.hasCompletedState = true,
   });
 
   final String iconName;
   final bool completed;
+  final bool isEditing;
   final bool hasCompletedState;
   final ValueChanged<bool>? onCompleted;
 
@@ -68,22 +70,22 @@ class _AnimatedTaskState extends State<AnimatedTask>
   }
 
   void _tapDown(TapDownDetails details) {
-    if (!_controller.isCompleted && !widget.completed) {
+    if (!widget.isEditing && !_controller.isCompleted && !widget.completed) {
       _controller.forward();
-    } else if (!_showCheckIcon) {
+    } else if (!_showCheckIcon && !widget.isEditing) {
       _controller.reset();
       widget.onCompleted?.call(false);
     }
   }
 
   void _tapUp(TapUpDetails details) {
-    if (!_controller.isCompleted) {
+    if (!widget.isEditing && !_controller.isCompleted) {
       _controller.reverse();
     }
   }
 
   void _tapCancel() {
-    if (!_controller.isCompleted) {
+    if (!widget.isEditing && !_controller.isCompleted) {
       _controller.reverse();
     }
   }
@@ -96,7 +98,7 @@ class _AnimatedTaskState extends State<AnimatedTask>
       onTapCancel: _tapCancel,
       child: AnimatedBuilder(
         animation: _controller,
-        builder: (context, child) {
+        builder: (_, child) {
           final progress = widget.completed ? 1.0 : _animation.value;
           return TaskRing(
             iconName: _showCheckIcon ? AppAssets.check : widget.iconName,

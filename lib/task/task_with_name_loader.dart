@@ -17,17 +17,18 @@ class TaskWithNameLoader extends ConsumerWidget {
 
   @override
   Widget build(BuildContext context, WidgetRef ref) {
-    final database = ref.watch(hiveDataBaseProvider);
+    final database = ref.watch(hiveDatabaseProvider);
     return ValueListenableBuilder(
       valueListenable: database.taskStateListenble(task: task),
       builder: (context, box, child) {
         final taskState = database.taskState(box, task: task);
         return TaskWithName(
           task: task,
+          isEditing: isEditing,
           completed: taskState.completed,
           editTaskButton: editTaskButton,
           onCompleted: (completed) {
-            ref.read(hiveDataBaseProvider).setTaskState(
+            ref.read(hiveDatabaseProvider).setTaskState(
                   task: task,
                   completed: completed,
                 );

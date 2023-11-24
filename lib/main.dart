@@ -48,7 +48,7 @@ Future<void> main() async {
   runApp(
     ProviderScope(
       overrides: [
-        hiveDataBaseProvider.overrideWithValue(hiveDatabase),
+        hiveDatabaseProvider.overrideWithValue(hiveDatabase),
         frontThemeProvider.overrideWith(
           (ref) => AppThemeNotifier(
             themeSttings: frontThemeSettings,

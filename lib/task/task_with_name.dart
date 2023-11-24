@@ -34,6 +34,7 @@ class TaskWithName extends StatelessWidget {
               AnimatedTask(
                 iconName: task.iconName,
                 completed: completed,
+                isEditing: isEditing,
                 onCompleted: onCompleted,
                 hasCompletedState: hasCompletedState,
               ),

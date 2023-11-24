@@ -60,6 +60,7 @@ class TasksGridScreen extends StatelessWidget {
                     tasks: tasks,
                     onFlip: onFlip,
                     onEnterEditMode: _enterEditMode,
+                    onExitEditMode: _exitEditMode,
                   ),
                   Positioned(
                     bottom: 7.0,
@@ -105,11 +106,13 @@ class TasksGridContents extends StatelessWidget {
     this.gridKey,
     this.onFlip,
     this.onEnterEditMode,
+    this.onExitEditMode,
   });
   final List<Task> tasks;
   final Key? gridKey;
   final VoidCallback? onFlip;
   final VoidCallback? onEnterEditMode;
+  final VoidCallback? onExitEditMode;
 
   @override
   Widget build(BuildContext context) {
@@ -125,6 +128,7 @@ class TasksGridContents extends StatelessWidget {
             child: TasksGrid(
               key: gridKey,
               tasks: tasks,
+              onAddOrEditTask: onExitEditMode,
             ),
           ),
         ),

@@ -28,7 +28,7 @@ class _HomeScreenState extends ConsumerState<HomeScreen> {
   final _backGridKey = GlobalKey<TasksGridState>();
   @override
   Widget build(BuildContext context) {
-    final database = ref.watch(hiveDataBaseProvider);
+    final database = ref.watch(hiveDatabaseProvider);
     return PageFlipBuilder(
       key: _pageFlipKey,
       frontBuilder: (_) => ValueListenableBuilder(
