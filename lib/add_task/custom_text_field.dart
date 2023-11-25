@@ -43,7 +43,6 @@ class CustomTextFieldState extends State<CustomTextField> {
         children: [
           Expanded(
             child: TextField(
-              // key: widget.key,
               // * This empty call to setState forces a rebuild which may show/hide the chevron.
               controller: _controller,
               onChanged: (value) => setState(() {}),

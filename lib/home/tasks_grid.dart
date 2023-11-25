@@ -1,6 +1,7 @@
 import 'dart:math';
 
 import 'package:flutter/material.dart';
+import 'package:flutter_riverpod/flutter_riverpod.dart';
 import 'package:habit_tracker/add_task/add_task_screen.dart';
 import 'package:habit_tracker/add_task/task_details_screen.dart';
 import 'package:habit_tracker/animations/fade_animation.dart';
@@ -54,7 +55,8 @@ class TasksGridState extends State<TasksGrid>
     setState(() => _isEditing = false);
   }
 
-  Future<void> _addTask() async {
+  Future<void> _addTask(WidgetRef ref) async {
+    final frontOrBackSide = ref.read(frontOrBackSideProvider);
     widget.onAddOrEditTask?.call();
     await Future.delayed(const Duration(milliseconds: 270));
     if (mounted) {
@@ -64,15 +66,18 @@ class TasksGridState extends State<TasksGrid>
           fullscreenDialog: true,
           builder: (_) => AppTheme(
             data: AppTheme.of(context),
-            child: const AddTaskScreen(),
+            child: AddTaskScreen(
+              frontOrBackSide: frontOrBackSide,
+            ),
           ),
         ),
       );
     }
   }
 
-  Future<void> _editTask(Task task) async {
+  Future<void> _editTask(WidgetRef ref, Task task) async {
     widget.onAddOrEditTask?.call();
+    final frontOrBackSide = ref.read(frontOrBackSideProvider);
     await Future.delayed(const Duration(milliseconds: 270));
     if (mounted) {
       Navigator.push(
@@ -84,7 +89,7 @@ class TasksGridState extends State<TasksGrid>
             child: TaskDetailsScreen(
               task: task,
               isNewTask: false,
-              frontOrBackSide: FrontOrBackSide.front,
+              frontOrBackSide: frontOrBackSide,
             ),
           ),
         ),
@@ -104,25 +109,29 @@ class TasksGridState extends State<TasksGrid>
       ),
       itemCount: min(6, widget.tasks.length + 1),
       itemBuilder: (context, index) {
-        if (index == widget.tasks.length) {
-          return FadeAnimation(
-            animation: _contrller,
-            child: AddTaskItem(
-              onCompleted: _isEditing ? _addTask : null,
-            ),
-          );
-        }
-        final task = widget.tasks[index];
-        return TaskWithNameLoader(
-          task: task,
-          isEditing: _isEditing,
-          editTaskButton: StaggeredScaleAnimation(
-            animation: _contrller,
-            index: index,
-            child: EditTaskButton(
-              onPressed: () => _editTask(task),
-            ),
-          ),
+        return Consumer(
+          builder: (context, ref, child) {
+            if (index == widget.tasks.length) {
+              return FadeAnimation(
+                animation: _contrller,
+                child: AddTaskItem(
+                  onCompleted: () => _isEditing ? _addTask(ref) : null,
+                ),
+              );
+            }
+            final task = widget.tasks[index];
+            return TaskWithNameLoader(
+              task: task,
+              isEditing: _isEditing,
+              editTaskButton: StaggeredScaleAnimation(
+                animation: _contrller,
+                index: index,
+                child: EditTaskButton(
+                  onPressed: () => _editTask(ref, task),
+                ),
+              ),
+            );
+          },
         );
       },
     );

@@ -78,39 +78,46 @@ class _ConfirmTaskContentsState extends ConsumerState<ConfirmTaskContents> {
   late String _iconName = widget.task.iconName;
 
   Future<void> _saveTask() async {
-    final textFieldState = _textFieldKey.currentState;
-    if (textFieldState != null) {
-      final task = Task(
-        id: widget.task.id,
-        name: _textFieldKey.currentState!.value,
-        iconName: _iconName,
-      );
-      try {
-        final database = ref.read(hiveDatabaseProvider);
-        // * Once the first task is added, we no longer need to show the onboarding screen
-        await database.setDidAddFirstTask(true);
-        await database.saveTask(task, widget.frontOrBackSide);
-        if (mounted) {
-          Navigator.of(context, rootNavigator: true).pop();
-        }
-      } catch (e) {
-        rethrow;
+    // final textFieldState = _textFieldKey.currentState;
+    // if (textFieldState != null) {
+    //   // Create new task with updated name and asset icon
+    //   final task = Task(
+    //     id: widget.task.id,
+    //     name: textFieldState.text,
+    //     iconName: _iconName,
+    //   );
+
+    try {
+      final database = ref.read(hiveDatabaseProvider);
+      // * Once the first task is added, we no longer need to show the onboarding screen
+      await database.setDidAddFirstTask(true);
+      await database.saveTask(widget.task, widget.frontOrBackSide);
+      if (mounted) {
+        Navigator.of(context).popUntil((route) => route.isFirst);
       }
+    } catch (e) {
+      rethrow;
     }
   }
 
-  Future<void> _deleteTask() async {
+  Future<void> deleteTask() async {
     final didConfirm = await showAdaptiveDialog<bool?>(
       context: context,
-      builder: (context) {
+      builder: (_) {
         return AlertDialog(
           title: const Text('Are you sure?'),
           actions: [
             TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.of(context).primary,
+              ),
               child: const Text('Delete'),
               onPressed: () => Navigator.of(context).pop(true),
             ),
             TextButton(
+              style: TextButton.styleFrom(
+                foregroundColor: AppTheme.of(context).primary,
+              ),
               child: const Text('Cancel'),
               onPressed: () => Navigator.of(context).pop(false),
             ),
@@ -135,7 +142,7 @@ class _ConfirmTaskContentsState extends ConsumerState<ConfirmTaskContents> {
     }
   }
 
-  Future<void> _changeIcon() async {
+  Future<void> changeIcon() async {
     final appThemeData = AppTheme.of(context);
     final iconName = await showModalBottomSheet<String?>(
       context: context,
@@ -153,42 +160,47 @@ class _ConfirmTaskContentsState extends ConsumerState<ConfirmTaskContents> {
 
   @override
   Widget build(BuildContext context) {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.stretch,
-      children: [
-        const SizedBox(height: 32),
-        ConfirmTaskHeader(
-          iconName: _iconName,
-          onChangeIcon: _changeIcon,
-        ),
-        const SizedBox(height: 48),
-        const TextFieldHeader('TITLE'),
-        CustomTextField(
-          key: _textFieldKey,
-          initialValue: widget.task.name,
-          hintText: 'Enter task title...',
-        ),
-        if (!widget.isNewTask) ...[
-          Container(height: 48),
-          TaskPresetListTile(
-            showChevron: false,
-            task: Task(
-              name: 'Delete Task',
-              iconName: AppAssets.delete,
+    return SingleChildScrollView(
+      reverse: true,
+      child: Column(
+        crossAxisAlignment: CrossAxisAlignment.stretch,
+        children: [
+          const SizedBox(height: 32),
+          ConfirmTaskHeader(
+            iconName: _iconName,
+            onChangeIcon: changeIcon,
+          ),
+          const SizedBox(height: 48),
+          const TextFieldHeader('TITLE'),
+          CustomTextField(
+            key: _textFieldKey,
+            initialValue: widget.task.name,
+            hintText: 'Enter task title...',
+          ),
+          if (!widget.isNewTask) ...[
+            Container(height: 48),
+            TaskPresetListTile(
+              showChevron: false,
+              task: Task(
+                name: 'Delete Task',
+                iconName: AppAssets.delete,
+              ),
+              onPressed: (_) => deleteTask(),
             ),
-            onPressed: (_) => _deleteTask(),
+          ],
+          widget.isNewTask
+              ? const SizedBox(height: 315)
+              : const SizedBox(height: 230),
+          Padding(
+            padding: const EdgeInsets.symmetric(horizontal: 16.0),
+            child: PrimaryButton(
+              title: widget.isNewTask ? 'SAVE TASK' : 'DONE',
+              onPressed: _saveTask,
+            ),
           ),
+          const SizedBox(height: 24.0),
         ],
-        const Spacer(),
-        Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 16.0),
-          child: PrimaryButton(
-            title: widget.isNewTask ? 'SAVE TASK' : 'DONE',
-            onPressed: _saveTask,
-          ),
-        ),
-        const SizedBox(height: 24.0),
-      ],
+      ),
     );
   }
 }

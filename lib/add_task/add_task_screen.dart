@@ -8,7 +8,11 @@ import 'package:habit_tracker/models/task.dart';
 import 'package:habit_tracker/theming/app_theme.dart';
 
 class AddTaskScreen extends StatelessWidget {
-  const AddTaskScreen({super.key});
+  const AddTaskScreen({
+    super.key,
+    required this.frontOrBackSide,
+  });
+  final FrontOrBackSide frontOrBackSide;
 
   @override
   Widget build(BuildContext context) {
@@ -28,13 +32,14 @@ class AddTaskScreen extends StatelessWidget {
           color: AppTheme.of(context).settingsText,
         ),
       ),
-      body: const AddTaskContents(),
+      body: AddTaskContents(frontOrBackSide: frontOrBackSide),
     );
   }
 }
 
 class AddTaskContents extends StatelessWidget {
-  const AddTaskContents({super.key});
+  const AddTaskContents({super.key, required this.frontOrBackSide});
+  final FrontOrBackSide frontOrBackSide;
 
   @override
   Widget build(BuildContext context) {
@@ -53,7 +58,7 @@ class AddTaskContents extends StatelessWidget {
                   builder: (_) => AppTheme(
                     data: AppTheme.of(context),
                     child: TaskDetailsScreen(
-                      frontOrBackSide: FrontOrBackSide.front,
+                      frontOrBackSide: frontOrBackSide,
                       isNewTask: true,
                       task: Task(
                         name: value,
@@ -84,7 +89,7 @@ class AddTaskContents extends StatelessWidget {
                         builder: (_) => AppTheme(
                           data: AppTheme.of(context),
                           child: TaskDetailsScreen(
-                            frontOrBackSide: FrontOrBackSide.front,
+                            frontOrBackSide: frontOrBackSide,
                             isNewTask: true,
                             task: task,
                           ),
