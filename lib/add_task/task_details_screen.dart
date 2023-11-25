@@ -74,29 +74,28 @@ class ConfirmTaskContents extends ConsumerStatefulWidget {
 }
 
 class _ConfirmTaskContentsState extends ConsumerState<ConfirmTaskContents> {
-  final _textFieldKey = GlobalKey<FormFieldState>();
+  final _textFieldKey = GlobalKey<CustomTextFieldState>();
   late String _iconName = widget.task.iconName;
 
   Future<void> _saveTask() async {
-    // final textFieldState = _textFieldKey.currentState;
-    // if (textFieldState != null) {
-    //   // Create new task with updated name and asset icon
-    //   final task = Task(
-    //     id: widget.task.id,
-    //     name: textFieldState.text,
-    //     iconName: _iconName,
-    //   );
-
-    try {
-      final database = ref.read(hiveDatabaseProvider);
-      // * Once the first task is added, we no longer need to show the onboarding screen
-      await database.setDidAddFirstTask(true);
-      await database.saveTask(widget.task, widget.frontOrBackSide);
-      if (mounted) {
-        Navigator.of(context).popUntil((route) => route.isFirst);
+    final textFieldState = _textFieldKey.currentState;
+    if (textFieldState != null) {
+      final task = Task(
+        id: widget.task.id,
+        name: textFieldState.text,
+        iconName: _iconName,
+      );
+      try {
+        final database = ref.read(hiveDatabaseProvider);
+        // * Once the first task is added, we no longer need to show the onboarding screen
+        await database.setDidAddFirstTask(true);
+        await database.saveTask(task, widget.frontOrBackSide);
+        if (mounted) {
+          Navigator.of(context).popUntil((route) => route.isFirst);
+        }
+      } catch (e) {
+        rethrow;
       }
-    } catch (e) {
-      rethrow;
     }
   }
 

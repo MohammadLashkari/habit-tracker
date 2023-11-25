@@ -22,6 +22,8 @@ class CustomTextField extends StatefulWidget {
 class CustomTextFieldState extends State<CustomTextField> {
   late final TextEditingController _controller;
 
+  String get text => _controller.value.text;
+
   @override
   void initState() {
     super.initState();
